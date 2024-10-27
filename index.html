@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AI Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 20%;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        #output {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            min-height: 50px;
+            font-size: 1.1em;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple AI Search Page</h1>
+        <input type="text" id="searchBox" placeholder="Type your question here" style="width: 80%; padding: 10px;">
+        <button onclick="getAIResponse()">Search</button>
+        <div id="output">Response will appear here...</div>
+    </div>
+
+    <script>
+        async function getAIResponse() {
+            const query = document.getElementById('searchBox').value;
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerText = 'Loading...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                // Check if data has a valid response structure
+                if (data.choices && data.choices.length > 0) {
+                    outputDiv.innerText = data.choices[0].message.content;
+                } else {
+                    outputDiv.innerText = 'No response from the AI.';
+                }
+            } catch (error) {
+                outputDiv.innerText = 'Error fetching response. Please try again.';
+                console.error('Error details:', error);
+            }
+        }
+    </script>
+</body>
+</html>
